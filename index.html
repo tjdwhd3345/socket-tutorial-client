@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket tutorial - Client</title>
+  </head>
+  <body>
+    <input type="text" autofocus />
+    <button type="button">SEND</button>
+    <p></p>
+  </body>
+  <script type="text/javascript">
+    const input = document.querySelector('input');
+    const button = document.querySelector('button');
+    const p = document.querySelector('p');
+    let socket;
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'Enter') handleButtonClick();
+    };
+    const handleButtonClick = (e) => {
+      const { value } = input;
+      if (value.length > 0) {
+        socket.send(JSON.stringify(value));
+        input.value = '';
+      }
+    };
+
+    const handleSocketOpen = (ev) => {
+      console.log('handleSocketOpen', { ev });
+    };
+    const handleSocketClose = () => console.log('socketClose');
+    const handleSocketMessage = (event) => {
+      const { data } = event;
+      console.log('socket is received message', { data });
+      p.innerHTML += `${data}<br/>`;
+    };
+
+    const init = () => {
+      input.addEventListener('keyup', handleKeyUp);
+      button.addEventListener('click', handleButtonClick);
+      if (window['WebSocket']) {
+        const wsUrl = `ws://${location.hostname}:5000`;
+        socket = new WebSocket(wsUrl);
+        socket.onopen = handleSocketOpen;
+        socket.onclose = handleSocketClose;
+        socket.onmessage = handleSocketMessage;
+      }
+    };
+
+    window.onload = init;
+  </script>
+</html>
